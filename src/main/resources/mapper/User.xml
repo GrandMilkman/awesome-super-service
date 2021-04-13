@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="by.vsu.soa.ioay.dao.UserDao">
+
+    <resultMap id="user" type="User">
+        <id column="USER_ID" property="id" />
+        <result column="USER_NAME" property="name" />
+        <result column="USER_PASSWD" property="passwd" />
+        <result column="USER_ACTIVE" property="active" />
+        <collection property="roles" javaType="java.util.HashSet" resultMap="by.vsu.soa.ioay.dao.RoleDao.role" />
+        <collection property="groups" javaType="java.util.List" resultMap="by.vsu.soa.ioay.dao.GroupDao.group" />
+    </resultMap>
+
+    <insert id="create" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (user_name, user_passwd) VALUES (#{name}, BCRYPT(#{passwd}))
+    </insert>
+
+    <select id="read" resultMap="user" parameterType="long">
+        SELECT u.*, r.*, g.* FROM users u
+        LEFT JOIN users_groups ug ON u.user_id = ug.user_id
+        LEFT JOIN groups g ON g.group_id = ug.group_id
+        LEFT JOIN groups_roles gr ON g.group_id = gr.group_id
+        LEFT JOIN roles r ON r.role_id=gr.role_id
+        WHERE u.user_id = #{id}
+    </select>
+
+    <update id="update" parameterType="User">
+        UPDATE users SET user_passwd = BCRYPT(#{passwd}) WHERE user_id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM users WHERE user_id = #{id}
+    </delete>
+
+    <select id="findByName" resultMap="user" parameterType="string">
+        SELECT u.*, r.* FROM users u
+        LEFT JOIN users_groups ug ON u.user_id = ug.user_id
+        LEFT JOIN groups g ON g.group_id = ug.group_id
+        LEFT JOIN groups_roles gr ON g.group_id = gr.group_id
+        LEFT JOIN roles r ON r.role_id=gr.role_id
+        WHERE u.user_name = #{name}
+    </select>
+
+    <select id="findAll" resultMap="user">
+        SELECT u.*, r.* FROM users u
+        LEFT JOIN users_groups ug ON u.user_id = ug.user_id
+        LEFT JOIN groups g ON g.group_id = ug.group_id
+        LEFT JOIN groups_roles gr ON g.group_id = gr.group_id
+        LEFT JOIN roles r ON r.role_id=gr.role_id
+    </select>
+
+    <select id="findAllMembers" resultMap="user" parameterType="java.lang.Long">
+        SELECT u.*, r.* FROM users u
+        LEFT JOIN users_groups ug ON u.user_id = ug.user_id
+        LEFT JOIN groups g ON g.group_id = ug.group_id
+        LEFT JOIN groups_roles gr ON g.group_id = gr.group_id
+        LEFT JOIN roles r ON r.role_id=gr.role_id
+        WHERE g.group_id = #{id}
+    </select>
+
+</mapper>

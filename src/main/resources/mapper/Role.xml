@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="by.vsu.soa.ioay.dao.RoleDao">
+
+    <resultMap id="role" type="Role">
+        <id column="ROLE_ID" property="id" />
+        <result column="ROLE_NAME" property="name" />
+    </resultMap>
+
+    <select id="findAll" resultMap="role">
+        SELECT r.* FROM roles r WHERE r.role_id &lt;&gt; 0 ORDER BY r.role_id
+    </select>
+
+    <select id="get" resultMap="role" parameterType="Long">
+        Select r.* FROM roles r WHERE r.role_id=#{id}
+    </select>
+
+    <delete id="deleteAll" parameterType="long">
+        DELETE FROM groups_roles WHERE group_id = #{id}
+    </delete>
+
+    <insert id="addRole">
+        INSERT INTO groups_roles (group_id, role_id) VALUES (#{gid}, #{rid})
+    </insert>
+</mapper>

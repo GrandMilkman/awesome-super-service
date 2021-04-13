@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="by.vsu.soa.ioay.dao.ContentDao">
+
+    <resultMap id="content" type="Content">
+        <id column="CONTENT_ID" property="id" />
+        <result column="CONTENT_NAME" property="name" />
+        <result column="CONTENT_SIZE" property="size" />
+        <result column="CONTENT_CONTENT_TYPE" property="contentType" javaType="string"/>
+        <result column="CONTENT_DESC" property="desc" javaType="string"/>
+        <result column="CONTENT_OWNER_ID" property="ownerId" />
+    </resultMap>
+
+    <insert id="create" parameterType="Content" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO contents (content_name, content_size, content_content_type, content_desc, content_owner_id) VALUES (#{name}, #{size}, #{contentType}, #{desc}, #{ownerId})
+    </insert>
+
+    <select id="read" resultMap="content" parameterType="long">
+        SELECT * FROM contents WHERE content_id = #{id}
+    </select>
+
+    <update id="update" parameterType="Content">
+        UPDATE contents SET content_name = #{name}, content_size = #{size}, content_cintent_type = ${contentType}, content_desc = #{desc} WHERE content_id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM contents WHERE content_id = #{id}
+    </delete>
+
+    <select id="findContentsByUserName" resultMap="content" parameterType="string">
+        SELECT f.* FROM contents f
+        LEFT JOIN users u ON u.user_id = f.content_owner_id
+        WHERE u.user_name = #{username}
+    </select>
+
+    <select id="findContent" resultMap="content">
+        SELECT f.* FROM contents f
+        LEFT JOIN users u ON u.user_id = f.content_owner_id
+        WHERE f.content_id = #{id} AND u.user_name = #{username}
+    </select>
+
+</mapper>

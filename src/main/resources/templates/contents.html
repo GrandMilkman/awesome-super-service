@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="commons::head"></head>
+<body>
+    <div th:replace="commons::navbar(active='contents')"></div>
+    <div class="wrapper">
+    <div class="container">
+        <div class="card"> 
+            <div th:unless="${#lists.isEmpty(contents)}" class="card-body">
+                <div class="card-body">
+                    <h4>Downloaded contents</h4>
+                </div>  
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Size</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Desc</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="content, stat :${contents}">
+                            <th scope="row" th:text="${stat.count}"></th>
+                            <td><a th:href="@{/download(id=${content.id})}" th:text="${content.name}">filename</a></td>
+                            <td th:text="${content.size}"></td>
+                            <td th:text="${content.contentType}"></td>
+                            <td th:text="${content.desc}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/content}" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <h4>Description</h4>
+                    </div>                   
+                    <div class="form-group">
+                        <textarea id="desc" name="desc" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button id="sender" class="btn btn-success" type="button">Upload File</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+<!-- modal window -->
+    <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Succes</h5>
+	                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	                    <span aria-hidden="true">&times;</span>
+	                </button>
+                </div>
+                <div class="modal-body">
+                    <p>contents uploaded</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/bootstrap.js}"></script>
+
+    <script type="text/javascript" th:inline="javascript">
+    var ajax, inputfile, xhr;
+
+    function upload_file(text, callback) {
+        xhr = new window.XMLHttpRequest();
+
+        $(document.body).append('<input class="file-attach" id="_content_" type="file" name="content" style="display:none;" />')
+
+        inputfile = $('#_content_');
+
+        inputfile.change(function (){
+            var file = this.files[0];
+
+            var formData = new FormData();
+            formData.append('content', file);
+            formData.append('desc', text);
+
+            ajax = $.ajax({
+                url: [[@{/content}]],
+                method: "POST",
+                data: formData,
+                async: true,
+                xhr: function() {
+                    xhr.upload.addEventListener('progress', function (evt) {
+                      var percent;
+                      if (evt.lengthComputable) {
+                         percent = Math.ceil(evt.loaded / evt.total * 100);
+                      } else {
+                         percent = 100;
+                      }
+                      console.log('percent: ' + percent);
+                    }, false);
+
+                    return xhr;
+                },
+                success: function (data) {
+                    callback(data);
+                    inputfile = null;
+                    window.onbeforeunload = null;
+                },
+                cache: false,
+                contentType: false,
+                processData: false,
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(textStatus + ' ' + errorThrown);
+                    inputfile = null;
+                }
+            });
+        });
+
+        var top = $(window).scrollTop();
+        inputfile.focus().trigger('click');
+        $(window).scrollTop(top);
+    }
+
+    $(document).ready(function(){
+        $("#sender").click(function(){
+            upload_file($('#desc').val(),function(){$("#modal").modal();});
+            return false;
+        });
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="commons::head"></head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h1>ERROR</h1>
+                    <div th:if="${error != null}" class="card-body" th:text="${error}">Message</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
