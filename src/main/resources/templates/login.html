@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="commons::head"></head>
+<body>
+    <div class="container">
+
+        <div class="card login"><div class="card-body">
+        <h5 class="card-title" th:text="#{login}">Login</h5>
+        <form th:action="@{/login}" method="POST">
+            <div th:if="${session.SPRING_SECURITY_LAST_EXCEPTION != null}" class="form-group">
+                <p class="form-control-static text-danger" th:text="#{login.error(${session.SPRING_SECURITY_LAST_EXCEPTION.message})}">Login error</p>
+            </div>
+
+            <div class="form-group">
+                <label for="username" th:text="#{username}">Username</label>
+                <input id="username" type="text" name="username" class="form-control" placeholder="Login" th:value="${session.LAST_USERNAME}" />
+            </div>
+
+            <div class="form-group">
+                <label for="password" th:text="#{password}">Password</label>
+                <input id="password" type="password" name="password" class="form-control" placeholder="Password" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Login</button>
+
+        </form>
+        </div></div>
+
+    </div>
+</body>
+</html>
