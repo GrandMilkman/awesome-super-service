@@ -46,7 +46,7 @@
                     <div class="form-group">
                         <div th:each="role : ${roles}" class="form-check">
                             <label>
-                                <input type="checkbox" name="rid" th:value="${role.id}" th:checked="${T(com.epam.rd.vitebsk.support.Functions).contains(role, userGroupRoles)}">
+                                <input type="checkbox" name="rid" th:value="${role.id}" th:checked="${T(by.vsu.soa.ioay.support.Functions).contains(role, userGroupRoles)}">
                                 <th:block th:text="${role.name}" />
                             </label>
                         </div>
@@ -55,7 +55,7 @@
                     <div class="form-group">
                         <div th:each="group : ${groups}" class="form-check">
                             <label>
-                                <input type="checkbox" name="gid" th:value="${group.id}" th:checked="${T(com.epam.rd.vitebsk.support.Functions).contains(group, form.user.groups)}">
+                                <input type="checkbox" name="gid" th:value="${group.id}" th:checked="${T(by.vsu.soa.ioay.support.Functions).contains(group, form.user.groups)}">
                                 <th:block th:text="${group.name}"/>
                                 <th:block th:each="role : ${group.roles}">
                                     <small><th:block th:text="${role.name}"/></small>
