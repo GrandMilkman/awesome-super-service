@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="by.vsu.soa.ioay.dao.GroupDao">
+
+    <resultMap id="group" type="Group">
+        <id column="GROUP_ID" property="id" />
+        <result column="GROUP_NAME" property="name" />
+		<collection property="roles" javaType="list" resultMap="by.vsu.soa.ioay.dao.RoleDao.role"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="group">
+        SELECT g.*, r.* FROM groups g
+        LEFT JOIN groups_roles gr ON g.group_id=gr.group_id
+        LEFT JOIN roles r ON r.role_id=gr.role_id
+        WHERE r.role_id &lt;&gt; 0
+    </select>
+
+    <select id="findByName" resultMap="group" parameterType="String">
+		SELECT g.*, r.* FROM groups g
+        LEFT JOIN groups_roles gr ON g.group_id = gr.group_id
+        LEFT JOIN roles r ON r.role_id = gr.role_id
+        WHERE g.group_name=#{name}
+    </select>
+
+    <delete id="deleteAll" parameterType="long">
+        DELETE FROM users_groups WHERE user_id = #{id}
+    </delete>
+
+    <insert id="addGroup">
+        INSERT INTO users_groups (user_id, group_id) VALUES (#{uid}, #{gid})
+    </insert>
+
+    <insert id="create" parameterType="Group" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO groups (group_name) VALUES (#{name})
+    </insert>
+
+    <update id="update" parameterType="Group">
+        UPDATE groups SET group_name = #{name} WHERE group_id = #{id}
+    </update>
+
+    <select id="read" resultMap="group" parameterType="long">
+        SELECT g.*, r.* FROM groups g
+        LEFT JOIN groups_roles gr ON g.group_id = gr.group_id
+        LEFT JOIN roles r ON r.role_id = gr.role_id
+        WHERE g.group_id = #{id}
+    </select>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM groups WHERE group_id = #{id}
+    </delete>
+
+    <delete id="deleteFromGroup">
+        DELETE FROM users_groups WHERE user_id = #{uid} and group_id = #{gid}
+    </delete>
+</mapper>

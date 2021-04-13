@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="commons::head"></head>
+<body>
+    <div class="container">
+        <div class="card">
+            <ul class="list-group list-group-flush">
+                <li th:each="info, stat : ${list}" class="list-group-item" th:text="${#strings.concat(stat.count, ' ', info)}">Info</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

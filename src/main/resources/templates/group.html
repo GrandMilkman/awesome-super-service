@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+  <head th:replace="commons::head"></head>
+<body>
+    <div th:replace="commons::navbar(active='newgroup')"></div>
+    <div class="wrapper">
+        <div class="container">
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="#{group.edit}">Group edit</h5>
+                    <form th:action="@{/groups/{id}(id=${form.group.id})}" method="POST" th:object="${form}">
+                    <!--spring:hasBindErrors name="form">
+                        <div class="alert alert-danger" role="alert">
+                        <ul><form:errors path="*" element="li" delimiter="</li><li>" /></ul>
+                    </div>
+                    </spring:hasBindErrors-->
+                    <!-- ID -->
+                    <div class="form-group">
+                        <input type="hidden" th:field="*{group.id}" />
+                    </div>
+                    <!-- NAME -->
+                    <div class="form-group">
+                        <label for="group.name" th:text="#{group.name}"></label>
+                        <input type="text" th:field="*{group.name}" th:class="*{group.id != null ? 'form-control-plaintext' : 'form-control'}" th:classappend="${#fields.hasErrors('group.name')} ? 'is-invalid'" th:readonly="*{group.id != null}">
+                        <div th:if="${#fields.hasErrors('group.name')}" class="invalid-feedback">
+                            <p th:errors="*{user.name}"/>
+                        </div>
+                    </div>
+                    <!-- ROLES -->
+                    <div class="form-group">
+                        <div th:each="role : ${roles}" class="form-check">
+                            <label>
+                                <input type="checkbox" name="rid" th:value="${role.id}" th:checked="${T(com.epam.rd.vitebsk.support.Functions).contains(role, form.group.roles)}">
+                                <th:block th:text="${role.name}" />
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+            <!-- MEMBERS -->
+            <div class="card mt-3" th:if="${form.group.id != null}">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="#{group.members}">Members</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li th:each="membr, status: ${members}" class="list-group-item">
+                        <th:block th:text="${membr.name}" />
+                        <a th:text="X" class="card-link float-right" th:href="@{/groups/{id}/{idmembr}(id=${form.group.id}, idmembr=${membr.id})}"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/bootstrap.js}"></script>
+</body>
+</html>
