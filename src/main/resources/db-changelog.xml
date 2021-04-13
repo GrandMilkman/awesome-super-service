@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="1.0" author="mikita" context="derby">
+        <createProcedure>
+            CREATE FUNCTION BCRYPT(str VARCHAR(128)) RETURNS
+            VARCHAR(72)
+            PARAMETER STYLE JAVA
+            NO SQL LANGUAGE JAVA
+            EXTERNAL NAME 'by.vsu.soa.ioay.util.BCrypt.bcrypt';
+        </createProcedure>
+    </changeSet>
+
+    <changeSet id="1.1" author="mikita">
+        <createTable tableName="users">
+            <column name="user_id" autoIncrement="true" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="users_pk"/>
+            </column>
+            <column name="user_name" type="VARCHAR(64)" >
+                <constraints nullable="false" />
+            </column>
+            <column name="user_passwd" type="VARCHAR(72)" />
+        </createTable>
+
+        <createTable tableName="roles">
+            <column name="role_id" autoIncrement="true" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="roles_pk"/>
+            </column>
+            <column name="role_name" type="VARCHAR(128)" >
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <createTable tableName="groups">
+            <column name="group_id" autoIncrement="true" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="groups_pk"/>
+            </column>
+            <column name="group_name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="users_groups">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" referencedTableName="users" referencedColumnNames="user_id" foreignKeyName="users_groups_users"/>
+            </column>
+            <column name="group_id" type="BIGINT">
+                <constraints nullable="false" referencedTableName="groups" referencedColumnNames="group_id" foreignKeyName="users_groups_groups"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="user_id, group_id" tableName="users_groups"/>
+
+        <createTable tableName="groups_roles">
+            <column name="group_id" type="BIGINT">
+                <constraints nullable="false" referencedTableName="groups" referencedColumnNames="group_id" foreignKeyName="groups_roles_groups"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false" referencedTableName="roles" referencedColumnNames="role_id" foreignKeyName="groups_roles_roles"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="group_id, role_id" tableName="groups_roles"/>
+
+        <insert tableName="roles">
+            <column name="role_id" valueNumeric="0" />
+            <column name="role_name" value="ROLE_SYSTEM" />
+        </insert>
+
+        <insert tableName="roles">
+            <column name="role_name" value="ROLE_USER" />
+        </insert>
+
+        <insert tableName="roles">
+            <column name="role_name" value="ROLE_ADMIN" />
+        </insert>
+
+        <insert tableName="groups">
+            <column name="group_id" valueNumeric="0"/>
+            <column name="group_name" value="SYSTEM"/>
+        </insert>
+
+        <insert tableName="groups">
+            <column name="group_name" value="ADMINS"/>
+        </insert>
+
+        <insert tableName="groups">
+            <column name="group_name" value="USERS"/>
+        </insert>
+
+        <sql>insert into users (user_name, user_passwd) values ('admin', BCRYPT('admin'))</sql>
+        <sql>insert into users_groups (user_id, group_id) values ((select user_id from users where user_name = 'admin'), (select group_id from groups where group_name = 'USERS'))</sql>
+        <sql>insert into users_groups (user_id, group_id) values ((select user_id from users where user_name = 'admin'), (select group_id from groups where group_name = 'ADMINS'))</sql>
+        <insert tableName="groups">
+            <column name="group_name" value="admin"/>
+        </insert>
+        <sql>insert into users_groups (user_id, group_id) values ((select user_id from users where user_name = 'admin'), (select group_id from groups where group_name = 'admin'))</sql>
+        <sql>insert into groups_roles (group_id, role_id) values ((select group_id from groups where group_name = 'admin'), (select role_id from roles where role_name = 'ROLE_USER'))</sql>
+        <sql>insert into groups_roles (group_id, role_id) values ((select group_id from groups where group_name = 'admin'), (select role_id from roles where role_name = 'ROLE_ADMIN'))</sql>
+
+        <sql>insert into groups_roles (group_id, role_id) values ((select group_id from groups where group_name = 'USERS'), (select role_id from roles where role_name = 'ROLE_USER'))</sql>
+        <sql>insert into groups_roles (group_id, role_id) values ((select group_id from groups where group_name = 'ADMINS'), (select role_id from roles where role_name = 'ROLE_ADMIN'))</sql>
+        <sql>insert into groups_roles (group_id, role_id) values ((select group_id from groups where group_name = 'ADMINS'), (select role_id from roles where role_name = 'ROLE_USER'))</sql>
+        <sql>insert into groups_roles (group_id, role_id) values ((select group_id from groups where group_name = 'SYSTEM'), (select role_id from roles where role_name = 'ROLE_SYSTEM'))</sql>
+    </changeSet>
+
+    <changeSet id="1.1.1" author="mikita" context="test">
+        <sql>insert into users (user_name, user_passwd) values ('foo', BCRYPT('foo'))</sql>
+        <sql>insert into users_groups (user_id, group_id) values ((select user_id from users where user_name = 'foo'), (select group_id from groups where group_name = 'USERS'))</sql>
+        <sql>insert into users_groups (user_id, group_id) values ((select user_id from users where user_name = 'foo'), (select group_id from groups where group_name = 'ADMINS'))</sql>
+        <insert tableName="groups">
+            <column name="group_name" value="foo"/>
+        </insert>
+        <sql>insert into users_groups (user_id, group_id) values ((select user_id from users where user_name = 'foo'), (select group_id from groups where group_name = 'foo'))</sql>
+        <sql>insert into groups_roles (group_id, role_id) values ((select group_id from groups where group_name = 'foo'), (select role_id from roles where role_name = 'ROLE_USER'))</sql>
+        <sql>insert into groups_roles (group_id, role_id) values ((select group_id from groups where group_name = 'foo'), (select role_id from roles where role_name = 'ROLE_ADMIN'))</sql>
+
+        <sql>insert into users (user_name, user_passwd) values ('user', BCRYPT('user'))</sql>
+        <sql>insert into users_groups (user_id, group_id) values ((select user_id from users where user_name = 'user'), (select group_id from groups where group_name = 'USERS'))</sql>
+        <insert tableName="groups">
+            <column name="group_name" value="user"/>
+        </insert>
+        <sql>insert into users_groups (user_id, group_id) values ((select user_id from users where user_name = 'user'), (select group_id from groups where group_name = 'user'))</sql>
+        <sql>insert into groups_roles (group_id, role_id) values ((select group_id from groups where group_name = 'user'), (select role_id from roles where role_name = 'ROLE_USER'))</sql>
+    </changeSet>
+
+    <changeSet id="1.2" author="mikita">
+        <createTable tableName="messages">
+            <column name="message_id" autoIncrement="true" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="messages_pk"/>
+            </column>
+            <column name="message_subject" type="VARCHAR(128)" />
+            <column name="message_text" type="VARCHAR(1024)" />
+            <column name="message_date" type="TIMESTAMP" />
+            <column name="message_from" type="BIGINT">
+                <constraints referencedTableName="users" referencedColumnNames="user_id" foreignKeyName="messages_users_from_fk" />
+            </column>
+            <column name="message_to" type="BIGINT">
+                <constraints referencedTableName="users" referencedColumnNames="user_id" foreignKeyName="messages_users_to_fk" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="1.2.1" author="mikita" context="test">
+        <sql>INSERT INTO messages (message_subject, message_text, message_date, message_from, message_to) VALUES ('subject_1', 'text_1', CURRENT_TIMESTAMP, (select user_id from users where user_name = 'admin'), (select user_id from users where user_name = 'user'))</sql>
+        <sql>INSERT INTO messages (message_subject, message_text, message_date, message_from, message_to) VALUES ('subject_2', 'text_2', CURRENT_TIMESTAMP, (select user_id from users where user_name = 'admin'), (select user_id from users where user_name = 'foo'))</sql>
+        <sql>INSERT INTO messages (message_subject, message_text, message_date, message_from, message_to) VALUES ('subject_3', 'text_3', CURRENT_TIMESTAMP, (select user_id from users where user_name = 'foo'),   (select user_id from users where user_name = 'user'))</sql>
+    </changeSet>
+
+    <changeSet id="1.3" author="mikita">
+        <addColumn tableName="users">
+            <column name="user_active" type="BOOLEAN" defaultValueBoolean="true" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="1.4" author="mikita">
+        <createTable tableName="contents">
+            <column name="content_id" autoIncrement="true" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="contents_pk"/>
+            </column>
+            <column name="content_name" type="VARCHAR(256)" >
+                <constraints nullable="false" />
+            </column>
+            <column name="content_size" type="BIGINT" >
+                <constraints nullable="false" />
+            </column>
+            <column name="content_content_type" type="VARCHAR(256)">
+                <constraints nullable="true" />
+            </column>
+            <column name="content_desc" type="VARCHAR(512)">
+                <constraints nullable="true" />
+            </column>
+            <column name="content_owner_id" type="BIGINT" >
+                <constraints nullable="false" referencedTableName="users" referencedColumnNames="user_id" foreignKeyName="contents_users" />
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
