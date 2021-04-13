@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+  <head th:replace="commons::head"></head>
+<body>
+    <div th:replace="commons::navbar(active='users newuser')"></div>
+    <div class="wrapper">
+        <div class="container">
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="#{user.edit}">User edit</h5>
+                    <form th:action="@{/users/{id}(id=${form.user.id})}" method="POST" th:object="${form}">
+                    <!--spring:hasBindErrors name="form">
+                        <div class="alert alert-danger" role="alert">
+                        <ul><form:errors path="*" element="li" delimiter="</li><li>" /></ul>
+                    </div>
+                    </spring:hasBindErrors-->
+                    <!-- ID -->
+                    <div class="form-group">
+                        <input type="hidden" th:field="*{user.id}" />
+                    </div>
+                    <!-- NAME -->
+                    <div class="form-group">
+                        <label for="user.name" th:text="#{user.name}"></label>
+                        <input type="text" th:field="*{user.name}" th:class="*{user.id != null ? 'form-control-plaintext' : 'form-control'}" th:classappend="${#fields.hasErrors('user.name')} ? 'is-invalid'" th:readonly="*{user.id != null}">
+                        <div th:if="${#fields.hasErrors('user.name')}" class="invalid-feedback">
+                            <p th:errors="*{user.name}"/>
+                        </div>
+                    </div>
+                    <!-- PASSWD -->
+                    <div class="form-group">
+                        <label for="user.passwd" th:text="#{user.passwd}"></label>
+                        <input type="password" th:field="*{user.passwd}" th:class="form-control" th:classappend="${#fields.hasErrors('user.passwd')} ? 'is-invalid'">
+                        <div th:if="${#fields.hasErrors('user.passwd')}" class="invalid-feedback">
+                            <p th:errors="*{user.passwd}"/>
+                        </div>
+                    </div>
+                    <!-- PASSWD2 -->
+                    <div class="form-group">
+                        <label for="user.passwd" th:text="#{user.passwd2}"></label>
+                        <input type="password" th:field="*{passwd}" th:class="form-control" th:classappend="${#fields.hasErrors('passwd')} ? 'is-invalid'">
+                        <div th:if="${#fields.hasErrors('passwd')}" class="invalid-feedback">
+                            <p th:errors="*{passwd}"/>
+                        </div>
+                    </div>
+                    <!-- ROLES -->
+                    <div class="form-group">
+                        <div th:each="role : ${roles}" class="form-check">
+                            <label>
+                                <input type="checkbox" name="rid" th:value="${role.id}" th:checked="${T(com.epam.rd.vitebsk.support.Functions).contains(role, userGroupRoles)}">
+                                <th:block th:text="${role.name}" />
+                            </label>
+                        </div>
+                    </div>
+                    <!-- GROUPS -->
+                    <div class="form-group">
+                        <div th:each="group : ${groups}" class="form-check">
+                            <label>
+                                <input type="checkbox" name="gid" th:value="${group.id}" th:checked="${T(com.epam.rd.vitebsk.support.Functions).contains(group, form.user.groups)}">
+                                <th:block th:text="${group.name}"/>
+                                <th:block th:each="role : ${group.roles}">
+                                    <small><th:block th:text="${role.name}"/></small>
+                                </th:block>
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/bootstrap.js}"></script>
+</body>
+</html>
