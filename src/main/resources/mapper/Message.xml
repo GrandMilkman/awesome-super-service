@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="by.vsu.soa.ioay.dao.MessageDao">
+
+    <resultMap id="message" type="Message">
+        <id column="message_id" property="id" />
+        <result column="message_subject" property="subject" />
+        <result column="message_text" property="text" />
+        <result column="message_date" property="date" />
+        <association property="from" javaType="User">
+            <id column="from_id" property="id" />
+            <result column="from_name" property="name" />
+        </association>
+        <association property="to" javaType="User">
+            <id column="to_id" property="id" />
+            <result column="to_name" property="name" />
+        </association>
+    </resultMap>
+
+    <insert id="create" parameterType="Message" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO messages (message_subject, message_text, message_date, message_from, message_to) VALUES (#{subject}, #{text}, CURRENT_TIMESTAMP, #{from.id}, #{to.id})
+    </insert>
+
+    <select id="read" resultMap="message" parameterType="long">
+        SELECT
+            m.*,
+            f.user_id AS from_id,
+            f.user_name AS from_name,
+            t.user_id AS to_id,
+            t.user_name AS to_name
+        FROM messages m 
+        LEFT JOIN users f ON f.user_id = m.message_from
+        LEFT JOIN users t ON t.user_id = m.message_to
+        WHERE m.message_id = #{id}
+    </select>
+
+    <update id="update" parameterType="User">
+        UPDATE messages SET message_subject = #{subject}, message_text = #{text}, message_date = CURRENT_TIMESTAMP WHERE message_id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM messages WHERE message_id = #{id}
+    </delete>
+
+    <select id="findByFrom" resultMap="message" parameterType="string">
+        SELECT
+            m.*,
+            f.user_id AS from_id,
+            f.user_name AS from_name,
+            t.user_id AS to_id,
+            t.user_name AS to_name
+        FROM messages m 
+        LEFT JOIN users f ON f.user_id = m.message_from
+        LEFT JOIN users t ON t.user_id = m.message_to
+        WHERE f.user_name = #{id}
+    </select>
+
+    <select id="findByTo" resultMap="message" parameterType="string">
+        SELECT
+            m.*,
+            f.user_id AS from_id,
+            f.user_name AS from_name,
+            t.user_id AS to_id,
+            t.user_name AS to_name
+        FROM messages m 
+        LEFT JOIN users f ON f.user_id = m.message_from
+        LEFT JOIN users t ON t.user_id = m.message_to
+        WHERE t.user_name = #{id}
+    </select>
+
+</mapper>
