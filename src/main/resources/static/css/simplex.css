@@ -1,0 +1,15 @@
+body {
+    padding-top: 76px;
+    padding-bottom: 66px;
+}
+.nav-item  > a{
+    margin-bottom: -4px;
+}
+#sidebar {
+            margin-top: +10px;
+        }
+.card {
+    border-top-style: none;
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
+}
