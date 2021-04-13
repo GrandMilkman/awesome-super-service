@@ -14,7 +14,7 @@
                     <li th:each="user, status: ${users}" class="list-group-item">
                         <a sec:authorize="hasRole('ROLE_ADMIN')" class="card-link user-name" th:href="@{/users/{id}(id=${user.id})}" th:text="${user.name}">User name</a>
                         <th:block sec:authorize="!hasRole('ROLE_ADMIN')" th:text="${user.name}" />
-                        <span class="text-info" th:text="${T(com.epam.rd.vitebsk.support.Functions).join(user.roles, 'name', ', ')}">Roles</span>
+                        <span class="text-info" th:text="${T(by.vsu.soa.ioay.support.Functions).join(user.roles, 'name', ', ')}">Roles</span>
                     </li>
                 </ul>
             </div>

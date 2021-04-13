@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.epam.rd</groupId>
-    <artifactId>vitebsk</artifactId>
+    <groupId>by.vsu.soa</groupId>
+    <artifactId>ioay</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
@@ -204,7 +204,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.epam.rd.vitebsk.Main</mainClass>
+                    <mainClass>by.vsu.soa.ioay.Main</mainClass>
                     <excludes>
                         <exclude>
                             <groupId>com.h2database</groupId>

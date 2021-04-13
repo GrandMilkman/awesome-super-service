@@ -30,7 +30,7 @@
                     <div class="form-group">
                         <div th:each="role : ${roles}" class="form-check">
                             <label>
-                                <input type="checkbox" name="rid" th:value="${role.id}" th:checked="${T(com.epam.rd.vitebsk.support.Functions).contains(role, form.group.roles)}">
+                                <input type="checkbox" name="rid" th:value="${role.id}" th:checked="${T(by.vsu.soa.ioay.support.Functions).contains(role, form.group.roles)}">
                                 <th:block th:text="${role.name}" />
                             </label>
                         </div>
